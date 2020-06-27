@@ -59,7 +59,7 @@ void Game::handleMousePress(SDL_MouseButtonEvent& button) {
 	if (button.button == SDL_BUTTON_LEFT){
 		std::cout << "Left Mouse Button Pressed\n";	//assumning that if left button is pressed we want to press.
 		SDL_GetMouseState(&x, &y);
-		board->highlightSquare(x, y);
+		board->highlightSquare(y, x);
 		
 	}
 }

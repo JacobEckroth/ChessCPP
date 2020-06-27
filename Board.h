@@ -16,5 +16,6 @@ public:
 	static int boxWidth;
 private:
 	Box boxes[8][8];
+	char pieces[8][8];
 };
 
