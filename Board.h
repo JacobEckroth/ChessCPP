@@ -10,12 +10,18 @@ public:
 	void render();
 	void renderBoardBackground();
 	void highlightSquare(int row, int col);
+	void updatePieceLocations();
+	void printBoard();
+
+	void removeSelectedPiece(int row, int col);
+
+
 	static int width;
 	static int height;
 	static int boxHeight;
 	static int boxWidth;
 private:
 	Box boxes[8][8];
-	char pieces[8][8];
+	char** pieces;
 };
 

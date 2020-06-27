@@ -5,6 +5,7 @@ char Piece::getType() {
 }
  
 
-bool Piece::getTeam() {
+char Piece::getTeam() {
 	return team;
 }
+

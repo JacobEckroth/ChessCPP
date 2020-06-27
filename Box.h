@@ -6,7 +6,7 @@ public:
 	int getRow();
 	int getCol();
 	Box();
-	/*~Box();*/
+	~Box();
 	Box(int,int);
 	bool highlighted();
 	void toggleHighlight();
@@ -15,6 +15,7 @@ public:
 	Piece* getPiece() {
 		return piece;
 	};
+	void removePiece();
 private:
 	int row;
 	int col;

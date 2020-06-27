@@ -3,12 +3,13 @@
 class Piece
 {
 public:
-	virtual std::vector<int> showMoves(int row, int col) = 0;
+	virtual std::vector<int> showMoves(int row, int col,char**) = 0;
 	 char getType();
-	 bool getTeam();
+	 char getTeam();
+	 void setType(char);
 
 protected:
 	char pieceType;
-	bool team;	//0 if black 1 if white
+	char team;	//0 if black 1 if white
 };
 

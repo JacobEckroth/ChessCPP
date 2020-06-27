@@ -34,9 +34,17 @@ bool Box::highlighted() {
 void Box::toggleHighlight() {
 	if (!isHighlighted) {
 		isHighlighted = true;
-		currentColor[0] = 188;//random higlight color, feel free to change this
-		currentColor[1] = 169;
-		currentColor[2] = 225;
+		if (originalColor[0] == 0) {
+			currentColor[0] = 25;
+			currentColor[1] = 85;
+			currentColor[2] = 53;
+		}
+		else {
+			currentColor[0] = 154;
+			currentColor[1] = 215;
+			currentColor[2] = 183;
+		}
+		
 	}
 	else {
 		isHighlighted = false;
@@ -54,23 +62,33 @@ void Box::render() {
 	rect.y = row * Board::boxHeight;
 	rect.w = Board::boxWidth;
 	rect.h = Board::boxHeight;
-	
+
 	SDL_SetRenderDrawColor(Game::renderer, currentColor[0], currentColor[1], currentColor[2], 255);
 	SDL_RenderFillRect(Game::renderer, &rect);
 }
 Box::Box() {
 	
 }
-/*Box::~Box() {
-	if (piece != NULL) {
+Box::~Box() {
+	if (piece) {
 		free(piece);
 	}
-}*/
+}
 
 void Box::setPiece(Piece* newPiece) {
 
 	if (piece) {
 		free(piece);
+		piece = nullptr;
 	}
 	piece = newPiece;
 };
+
+void Box::removePiece() {
+	if (piece) {
+		free(piece);
+		piece = nullptr;
+	}
+	
+	
+}

@@ -23,6 +23,7 @@ private:
 	bool isRunning;
 	SDL_Window* window;
 	Board* board;
+	char currentTurn;
 	
 
 
