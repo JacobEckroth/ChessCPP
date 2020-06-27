@@ -28,7 +28,7 @@ bool Box::highlighted() {
 void Box::toggleHighlight() {
 	if (!isHighlighted) {
 		isHighlighted = true;
-		currentColor[0] = 188;
+		currentColor[0] = 188;//random higlight color, feel free to change this
 		currentColor[1] = 169;
 		currentColor[2] = 225;
 	}
