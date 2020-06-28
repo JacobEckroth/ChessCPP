@@ -58,16 +58,14 @@ void Game::handleEvents() {
 void Game::handleMousePress(SDL_MouseButtonEvent& button) {
 	int x, y;
 	if (button.button == SDL_BUTTON_LEFT){
-		std::cout << "Left Mouse Button Pressed\n";	//assumning that if left button is pressed we want to press.
+		
 		SDL_GetMouseState(&x, &y);
 		board->movePiece(y, x,currentTurn); 
 	}
 	else if (button.button == SDL_BUTTON_RIGHT) {	//delete the piece if you right click
-		std::cout << "Right button pressed\n";
+		
 		SDL_GetMouseState(&x, &y);
-
-		board->removeSelectedPiece(y, x,currentTurn);
-		board->updatePieceLocations();
+		
 	}
 	
 }

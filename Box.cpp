@@ -103,7 +103,7 @@ Box::Box() {
 }
 Box::~Box() {
 	if (piece) {
-		free(piece);
+		delete(piece);
 	}
 }
 
@@ -113,8 +113,8 @@ void Box::setPiece(Piece* newPiece) {
 };
 
 void Box::removePiece() {
-	if (piece) {
+	/*if (piece) {
 		free(piece);
 		piece = nullptr;
-	}
+	}*/
 }

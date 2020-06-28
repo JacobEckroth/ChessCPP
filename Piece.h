@@ -21,6 +21,9 @@ public:
 	 void setMoved() {
 		 hasMoved = true;
 	 }
+	 void resetMoved(bool newMoved) {
+		 hasMoved = newMoved;
+	 }
 	 bool moved() {
 		 return hasMoved;
 	 }
