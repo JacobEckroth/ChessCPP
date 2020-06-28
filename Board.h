@@ -7,7 +7,10 @@ class Board
 public:
 	Board();
 	~Board();
-	void render();
+	void render(Box**);
+	Box** getBoxes() {
+		return boxes;
+	}
 	void renderBoardBackground();
 	void highlightSquare(int row, int col,char);
 	void updatePieceLocations(Box**,char**&);

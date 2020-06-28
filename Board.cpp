@@ -73,7 +73,7 @@ Board::~Board() {
 }
 
 
-void Board::render() {
+void Board::render(Box** renderBoxes) {
 	renderBoardBackground();
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -266,6 +266,7 @@ void Board::attemptMove(char& currentTurn,Box**& checkBoxes) {
 bool Board::whiteKingInCheck(Box** searchBoxes,char** currentPieces) {
 	int kingRow, kingCol;
 	findKingRow(kingRow, kingCol, 'w',searchBoxes);
+	
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			if (searchBoxes[i][j].getPiece()) {
@@ -289,6 +290,7 @@ bool Board::blackKingInCheck(Box** searchBoxes,char** currentPieces) {
 	int kingRow, kingCol;
 	
 	findKingRow(kingRow, kingCol, 'b',searchBoxes);
+	
 	
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -378,14 +380,14 @@ char Board::checkForCheckmate(char currentTeam){ //we will check if the player i
 
 bool Board::stillInCheckAfterThis(Box**& boardCopy, char**& testPieces, int row, int col, int moveToRow, int moveToCol, char currentTeam) {
 	
-	if (boardCopy[moveToRow][moveToCol].getPiece()) {
-		boardCopy[moveToRow][moveToCol].setPiece(boardCopy[row][col].getPiece());
-		boardCopy[row][col].setPiece(NULL);
-		
-	 }
+	
+	boardCopy[moveToRow][moveToCol].setPiece(boardCopy[row][col].getPiece());
+	boardCopy[row][col].setPiece(NULL);
+	
+	
 	
 	updatePieceLocations(boardCopy, testPieces);
-
+	
 	switch (currentTeam) {
 	case 'w':
 		if (whiteKingInCheck(boardCopy,testPieces)) {

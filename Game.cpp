@@ -73,8 +73,10 @@ void Game::handleMousePress(SDL_MouseButtonEvent& button) {
 void Game::render() {
 	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 	SDL_RenderClear(renderer);
-	board->render();
-	SDL_RenderPresent(renderer);
+	board->render(board->getBoxes());
+	SDL_RenderPresent(Game::renderer);
+
+	
 }
 
 bool Game::running() {
