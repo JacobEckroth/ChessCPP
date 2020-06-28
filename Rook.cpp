@@ -77,3 +77,13 @@ Rook::Rook(char team,int row, int col) {
 
 
 }
+bool Rook::attemptMove(int newRow, int newCol, char** boardStatus) {
+	std::vector<int> possibleMoves = showMoves(row, col, boardStatus);
+
+	for (int i = 0; i < possibleMoves.size() / 2; i++) {
+		if (newRow == possibleMoves[i * 2] && newCol == possibleMoves[i * 2 + 1]) {
+			return true;
+		}
+	}
+	return false;
+}

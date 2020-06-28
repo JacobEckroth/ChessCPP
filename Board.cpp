@@ -90,13 +90,12 @@ void Board::renderBoardBackground() {
 	
 }
 
-void Board::highlightSquare(int row, int col) {
-	std::cout << "Checking row:" << row << " and col:" << col << std::endl;
+void Board::highlightSquare(int row, int col,char currentTurn) {
 	std::vector<int> test = (boxes[row][col].getPiece())->showMoves(row, col,pieces);
 	
 
 	for (int i = 0; i < test.size() / 2; i++) {
-		boxes[test[i * 2]][test[i * 2 + 1]].toggleHighlight();	//this works because the coordinates are provided 
+		boxes[test[i * 2]][test[i * 2 + 1]].toggleHighlight(currentTurn);	//this works because the coordinates are provided 
 		//2 in a row, so if I multiply by 2 I can get to the first and the second.
 	}
 
@@ -128,7 +127,8 @@ void Board::printBoard() {
 	}
 }
 
-void Board::removeSelectedPiece(int row, int col) {
+void Board::removeSelectedPiece(int row, int col,char currentTurn) {
+	setDownPiece(currentTurn);
 	row = row / 100;
 	col = col / 100;
 	boxes[row][col].removePiece();
@@ -136,18 +136,20 @@ void Board::removeSelectedPiece(int row, int col) {
 }
 
 
-void Board::movePiece(int row, int col, char currentTurn) {
-	if (pickedUpCol != -1) {
-		setDownPiece();
+void Board::movePiece(int row, int col, char &currentTurn) {
+	if (pickedUpCol != -1) {	//if we're holding a piece
+		setDownPiece(currentTurn);
 	}
-	row = row / 100;
-	col = col / 100;
-	if (boxes[row][col].getPiece()) {
-		if (boxes[row][col].getPiece()->getTeam() == currentTurn) {
-			pickedUpRow = row;
-			pickedUpCol = col;
-			this->highlightSquare(pickedUpRow,pickedUpCol);
-			pickUpPiece(pickedUpRow, pickedUpCol);
+	else { //picking up a new piece
+		row = row / 100;
+		col = col / 100;
+		if (boxes[row][col].getPiece()) {
+			if (boxes[row][col].getPiece()->getTeam() == currentTurn) {
+				pickedUpRow = row;
+				pickedUpCol = col;
+				this->highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
+				pickUpPiece(pickedUpRow, pickedUpCol);
+			}
 		}
 	}
 
@@ -164,10 +166,49 @@ void Board::update() {
 	}
 }
 
+void Board::setDownPiece(char &currentTurn) {	//test to see if we want to set down a piece
 
-void Board::setDownPiece() {
-	boxes[pickedUpRow][pickedUpCol].getPiece()->resetPlace();
-	highlightSquare(pickedUpRow, pickedUpCol);
+	if (pickedUpCol != -1) { //checking if a piece is actually picked up
+		attemptMove(currentTurn);
+		
+	}
+	else {
+		std::cout << "Tried to set down a piece that didn't exist" << std::endl;
+	}
+
+}
+
+void Board::attemptMove(char& currentTurn) {
+	int x;
+	int y;
+	SDL_GetMouseState(&x, &y);
+	int row = y / 100;
+	int col = x / 100;
+	if (boxes[pickedUpRow][pickedUpCol].getPiece()->attemptMove(row,col,pieces)) { //if we can move there.
+		if (boxes[row][col].getPiece()) {	//if there's a piece to take
+			highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
+			boxes[row][col].removePiece();
+			boxes[row][col].setPiece(boxes[pickedUpRow][pickedUpCol].getPiece());
+			boxes[pickedUpRow][pickedUpCol].setPiece(NULL);
+		}
+		else {	//if yo ucan just move there.
+			highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
+			boxes[row][col].setPiece(boxes[pickedUpRow][pickedUpCol].getPiece());
+			boxes[pickedUpRow][pickedUpCol].setPiece(NULL);
+			std::cout << boxes[row][col].getPiece() << " that's weird" << std::endl;
+		}
+		boxes[row][col].getPiece()->setRow(row);
+		boxes[row][col].getPiece()->setCol(col);
+		boxes[row][col].getPiece()->resetPlace();
+		boxes[row][col].getPiece()->setMoved();
+		currentTurn == 'w' ? currentTurn = 'b' : currentTurn = 'w';
+	}
+	else {
+		highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
+		boxes[pickedUpRow][pickedUpCol].getPiece()->resetPlace();
+		std::cout << "Can't move there!" << std::endl;
+	}
+	
 	pickedUpRow = -1;
 	pickedUpCol = -1;
 	updatePieceLocations();

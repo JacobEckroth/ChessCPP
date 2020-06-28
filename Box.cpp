@@ -41,18 +41,40 @@ bool Box::highlighted() {
 	return isHighlighted;
 }
 
-void Box::toggleHighlight() {
+void Box::toggleHighlight(char currentPlayer) {
 	if (!isHighlighted) {
 		isHighlighted = true;
 		if (originalColor[0] == lightTan[0]) {
-			currentColor[0] = 154;
-			currentColor[1] = 190;
-			currentColor[2] = 134;
+			if (getPiece()) {
+				if (getPiece()->getTeam() != currentPlayer) {
+					currentColor[0] = 248;
+					currentColor[1] = 138;
+					currentColor[2] = 112;
+				}
+				
+			}
+			else {
+				currentColor[0] = 154;
+				currentColor[1] = 190;
+				currentColor[2] = 134;
+			}
+		
 		}
 		else {
-			currentColor[0] = 130;
-			currentColor[1] = 159;
-			currentColor[2] = 90;
+			if (getPiece()) {
+				if (getPiece()->getTeam() != currentPlayer) {
+					currentColor[0] = 220;
+					currentColor[1] = 97;
+					currentColor[2] = 58;
+				
+				}
+			}else {
+					currentColor[0] = 130;
+					currentColor[1] = 159;
+					currentColor[2] = 90;
+			}
+
+			
 		}
 		
 	}
@@ -87,10 +109,6 @@ Box::~Box() {
 
 void Box::setPiece(Piece* newPiece) {
 
-	if (piece) {
-		free(piece);
-		piece = nullptr;
-	}
 	piece = newPiece;
 };
 
@@ -99,6 +117,4 @@ void Box::removePiece() {
 		free(piece);
 		piece = nullptr;
 	}
-	
-	
 }

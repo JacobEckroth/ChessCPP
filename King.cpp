@@ -65,3 +65,12 @@ King::King(char team,int row, int col){
 	destRect.x = col * 100;
 	destRect.y = row * 100;
 }
+bool King::attemptMove(int newRow, int newCol, char** boardStatus) {
+	std::vector<int> possibleMoves = showMoves(row, col, boardStatus);
+	for (int i = 0; i < possibleMoves.size() / 2; i++) {
+		if (newRow == possibleMoves[i * 2] && newCol == possibleMoves[ i * 2 + 1]) {
+			return true;
+		}
+	}
+	return false;
+}

@@ -65,7 +65,8 @@ void Game::handleMousePress(SDL_MouseButtonEvent& button) {
 	else if (button.button == SDL_BUTTON_RIGHT) {	//delete the piece if you right click
 		std::cout << "Right button pressed\n";
 		SDL_GetMouseState(&x, &y);
-		board->removeSelectedPiece(y, x);
+
+		board->removeSelectedPiece(y, x,currentTurn);
 		board->updatePieceLocations();
 	}
 	

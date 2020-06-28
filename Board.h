@@ -9,17 +9,17 @@ public:
 	~Board();
 	void render();
 	void renderBoardBackground();
-	void highlightSquare(int row, int col);
+	void highlightSquare(int row, int col,char);
 	void updatePieceLocations();
 	void printBoard();
 
-	void removeSelectedPiece(int row, int col);
+	void removeSelectedPiece(int row, int col,char);
 
-	void movePiece(int y,int  x,char currentTurn);
+	void movePiece(int y,int  x,char& currentTurn);
 	void pickUpPiece(int row, int col);
-	void setDownPiece();
+	void setDownPiece(char &currentTurn);
 	void update();
-
+	void attemptMove(char&);
 
 	static int width;
 	static int height;

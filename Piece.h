@@ -11,6 +11,19 @@ public:
 	 void render();
 	 void drawToMouse();
 	 void resetPlace();
+	 virtual bool attemptMove(int row, int col,char**) = 0;
+	 void setRow(int row) {
+		 this->row = row;
+	 }
+	 void setCol(int col) {
+		 this->col = col;
+	 }
+	 void setMoved() {
+		 hasMoved = true;
+	 }
+	 bool moved() {
+		 return hasMoved;
+	 }
 
 protected:
 	char pieceType;
@@ -21,5 +34,6 @@ protected:
 	SDL_Rect destRect;
 	int row;
 	int col;
+	bool hasMoved;
 };
 
