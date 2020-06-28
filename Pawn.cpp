@@ -1,6 +1,7 @@
 #include "Pawn.h"
 #include <vector>
 #include <iostream>
+#include "TextureManager.h"
 std::vector<int> Pawn::showMoves(int row, int col,char** boardStatus) {
 	std::vector<int> possibleMoves;
 	if (team == 'w') {
@@ -47,8 +48,20 @@ std::vector<int> Pawn::showMoves(int row, int col,char** boardStatus) {
 	}
 	return possibleMoves;
 }
-Pawn::Pawn(char team) {
+Pawn::Pawn(char team,int row, int col) {
+	this->row = row;
+	this->col = col;
 	pieceType = 'p';
 	this->team = team;
 	hasMoved = false;
+	if (team == 'w') {
+		pieceTexture = TextureManager::LoadTexture("images/whitePawn.png");
+	}
+	else {
+		pieceTexture = TextureManager::LoadTexture("images/blackPawn.png");
+	}
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = srcRect.h = destRect.w = destRect.h = 100;
+	destRect.x = col * 100;
+	destRect.y = row * 100;
 }

@@ -3,3 +3,6 @@ Chess.vcxproj
 Chess.vcxproj.filters
 Chess.vcxproj.user
 SDL2.dll
+SDL2_image.dll
+libpng16-16.dll
+zlib1.dll

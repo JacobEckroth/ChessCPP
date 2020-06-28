@@ -1,6 +1,7 @@
 #include "Queen.h"
 #include <vector>
 #include <iostream>
+#include "TextureManager.h"
 std::vector<int> Queen::showMoves(int row, int col, char** boardStatus) {
 	std::vector<int> possibleMoves;
 	int tempRow = row;
@@ -77,7 +78,19 @@ bool Queen::canKeepMoving(std::vector<int>& possibleMoves, int row, int col, cha
 	}
 }
 
-Queen::Queen(char team){
+Queen::Queen(char team,int row, int col){
 	pieceType = 'q';
+	this->row = row;
+	this->col = col;
 	this->team = team;
+	if (team == 'w') {
+		pieceTexture = TextureManager::LoadTexture("images/whiteQueen.png");
+	}
+	else {
+		pieceTexture = TextureManager::LoadTexture("images/blackQueen.png");
+	}
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = srcRect.h = destRect.w = destRect.h = 100;
+	destRect.x = col * 100;
+	destRect.y = row * 100;
 }

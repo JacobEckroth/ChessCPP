@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include "TextureManager.h"
 std::vector<int> King::showMoves(int row, int col,char** boardStatus) {
 	std::vector<int> possibleMoves;
 
@@ -48,7 +49,19 @@ void King::tryMove(std::vector<int>& possibleMoves, int row, int col, char** boa
 	}
 }
 
-King::King(char team){
+King::King(char team,int row, int col){
+	this->row = row;
+	this->col = col;
 	pieceType = 'k';
 	this->team = team;
+	if (team == 'w') {
+		pieceTexture = TextureManager::LoadTexture("images/whiteKing.png");
+	}
+	else {
+		pieceTexture = TextureManager::LoadTexture("images/blackKing.png");
+	}
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = srcRect.h = destRect.w = destRect.h = 100;
+	destRect.x = col * 100;
+	destRect.y = row * 100;
 }

@@ -1,4 +1,5 @@
 #include "Knight.h"
+#include "TextureManager.h"
 #include <vector>
 #include <iostream>
 std::vector<int> Knight::showMoves(int row, int col,char** boardStatus) {
@@ -50,7 +51,19 @@ void Knight::testMove(std::vector<int>& possibleMoves, int row, int col,char** b
 	}
 }
 
-Knight::Knight(char team) {
+Knight::Knight(char team,int row, int col) {
 	pieceType = 'k';
+	this->row = row;
+	this->col = col;
 	this->team = team;
+	if (team == 'w') {
+		pieceTexture = TextureManager::LoadTexture("images/whiteKnight.png");
+	}
+	else {
+		pieceTexture = TextureManager::LoadTexture("images/blackKnight.png");
+	}
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = srcRect.h = destRect.w = destRect.h = 100;
+	destRect.x = col * 100;
+	destRect.y = row * 100;
 }

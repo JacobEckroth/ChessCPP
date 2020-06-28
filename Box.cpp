@@ -7,6 +7,11 @@
 #include "Rook.h"
 #include "Queen.h"
 #include <iostream>
+int lightTan[3] = { 255,206,158 };
+int darkTan[3] = { 209,139,71};
+
+
+
 int Box::getRow() {
 	return row;
 }
@@ -18,10 +23,15 @@ Box::Box(int row, int col) {
 	this->row = row;
 	this->col = col;
 	if ((row + col) % 2 == 0) { //this works to detect every other row. Kinda guessed on this one.
-		originalColor[0] = originalColor[1] = originalColor[2] = currentColor[0] = currentColor[1] = currentColor[2] = 255;
+		originalColor[0] = currentColor[0] = lightTan[0];
+		originalColor[1] = currentColor[1] = lightTan[1];
+		originalColor[2] = currentColor[2] = lightTan[2];
+
 	}
 	else {
-		originalColor[0] = originalColor[2] = originalColor[1] = currentColor[0] = currentColor[1] =currentColor[2]= 0;
+		originalColor[0] = currentColor[0] = darkTan[0];
+		originalColor[1] = currentColor[1] = darkTan[1];
+		originalColor[2] = currentColor[2] = darkTan[2];
 	}
 	isHighlighted = false;
 	
@@ -34,15 +44,15 @@ bool Box::highlighted() {
 void Box::toggleHighlight() {
 	if (!isHighlighted) {
 		isHighlighted = true;
-		if (originalColor[0] == 0) {
-			currentColor[0] = 25;
-			currentColor[1] = 85;
-			currentColor[2] = 53;
+		if (originalColor[0] == lightTan[0]) {
+			currentColor[0] = 154;
+			currentColor[1] = 190;
+			currentColor[2] = 134;
 		}
 		else {
-			currentColor[0] = 154;
-			currentColor[1] = 215;
-			currentColor[2] = 183;
+			currentColor[0] = 130;
+			currentColor[1] = 159;
+			currentColor[2] = 90;
 		}
 		
 	}

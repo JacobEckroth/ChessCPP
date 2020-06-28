@@ -24,6 +24,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		isRunning = false;
 	}
 	board = new Board();
+	currentTurn = 'w';
 }
 
 void Game::clean() {
@@ -36,7 +37,7 @@ void Game::clean() {
 }
 
 void Game::update() {
-
+	board->update();
 }
 
 void Game::handleEvents() {
@@ -59,14 +60,15 @@ void Game::handleMousePress(SDL_MouseButtonEvent& button) {
 	if (button.button == SDL_BUTTON_LEFT){
 		std::cout << "Left Mouse Button Pressed\n";	//assumning that if left button is pressed we want to press.
 		SDL_GetMouseState(&x, &y);
-		board->highlightSquare(y, x);	
+		board->movePiece(y, x,currentTurn); 
 	}
-	else if (button.button = SDL_BUTTON_RIGHT) {
+	else if (button.button == SDL_BUTTON_RIGHT) {	//delete the piece if you right click
 		std::cout << "Right button pressed\n";
 		SDL_GetMouseState(&x, &y);
 		board->removeSelectedPiece(y, x);
+		board->updatePieceLocations();
 	}
-	board->updatePieceLocations();
+	
 }
 
 void Game::render() {

@@ -15,6 +15,11 @@ public:
 
 	void removeSelectedPiece(int row, int col);
 
+	void movePiece(int y,int  x,char currentTurn);
+	void pickUpPiece(int row, int col);
+	void setDownPiece();
+	void update();
+
 
 	static int width;
 	static int height;
@@ -23,5 +28,7 @@ public:
 private:
 	Box boxes[8][8];
 	char** pieces;
+	int pickedUpCol;
+	int pickedUpRow;
 };
 

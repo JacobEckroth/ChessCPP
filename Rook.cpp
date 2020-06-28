@@ -1,5 +1,5 @@
 #include "Rook.h"
-
+#include "TextureManager.h"
 #include <vector>
 #include <iostream>
 std::vector<int> Rook::showMoves(int row, int col,char** boardStatus) {
@@ -58,7 +58,22 @@ bool Rook::areWeDone(std::vector<int>& possibleMoves,char**boardStatus,int tempR
 	return false;
 }
 
-Rook::Rook(char team) {
+Rook::Rook(char team,int row, int col) {
+	this->row = row;
+	this->col = col;
 	this->team = team;
 	pieceType = 'r';
+	if (team == 'w') {
+		pieceTexture = TextureManager::LoadTexture("images/whiteRook.png");
+	}
+	else {
+		pieceTexture = TextureManager::LoadTexture("images/blackRook.png");
+	}
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = srcRect.h = destRect.w = destRect.h = 100;
+	destRect.x = col * 100;
+	destRect.y = row * 100;
+
+
+
 }
