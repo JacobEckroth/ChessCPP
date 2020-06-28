@@ -77,3 +77,4 @@ bool Pawn::attemptMove(int newRow, int newCol, char** boardStatus) {
 	}
 	return false;
 }
+

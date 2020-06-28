@@ -195,7 +195,7 @@ void Board::attemptMove(char& currentTurn) {
 			highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
 			boxes[row][col].setPiece(boxes[pickedUpRow][pickedUpCol].getPiece());
 			boxes[pickedUpRow][pickedUpCol].setPiece(NULL);
-			std::cout << boxes[row][col].getPiece() << " that's weird" << std::endl;
+			
 		}
 		boxes[row][col].getPiece()->setRow(row);
 		boxes[row][col].getPiece()->setCol(col);
@@ -212,5 +212,83 @@ void Board::attemptMove(char& currentTurn) {
 	pickedUpRow = -1;
 	pickedUpCol = -1;
 	updatePieceLocations();
+	if (whiteKingInCheck()) {
+		std::cout << "The white king is in check!"<<std::endl;
+	}
+	if (blackKingInCheck()) {
+		std::cout << "The Black king is in check!" << std::endl;
+	}
 
+}
+
+
+bool Board::whiteKingInCheck() {
+	int kingRow, kingCol;
+	findKingRow(kingRow, kingCol, 'w');
+	std::cout << "White king row and col are: " << kingRow << " " << kingCol<<std::endl;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (boxes[i][j].getPiece()) {
+				if (boxes[i][j].getPiece()->getTeam() == 'b') {
+					std::vector<int> possibleAttacks = boxes[i][j].getPiece()->showMoves(i,j,pieces);
+					for (int i = 0; i < possibleAttacks.size() / 2; i++) {
+						if (possibleAttacks[i * 2] == kingRow && possibleAttacks[i * 2 + 1] == kingCol) {
+							
+							return true;
+						}
+					}
+				}
+			
+			}
+		}
+	}
+	return false;
+
+
+}
+
+bool Board::blackKingInCheck() {
+	int kingRow, kingCol;
+	findKingRow(kingRow, kingCol, 'b');
+	std::cout << "Black king row and col are: " << kingRow << " " << kingCol << std::endl;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (boxes[i][j].getPiece()) {
+				if (boxes[i][j].getPiece()->getTeam() == 'w') {
+					std::vector<int> possibleAttacks = boxes[i][j].getPiece()->showMoves(i, j, pieces);
+					for (int i = 0; i < possibleAttacks.size() / 2; i++) {
+						if (possibleAttacks[i * 2] == kingRow && possibleAttacks[i * 2 + 1] == kingCol) {
+							
+							return true;
+						}
+					}
+				}
+
+			}
+		}
+	}
+	return false;
+
+
+}
+
+void Board::findKingRow(int& kingRow, int& kingCol, char team) {
+	bool kingFound = false;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (boxes[i][j].getPiece()) {
+				if (boxes[i][j].getPiece()->getTeam() == team && boxes[i][j].getPiece()->getType() == 'K') {
+					kingRow = i;
+					kingCol = j;
+					kingFound = true;
+				}
+			}
+			if (kingFound) {
+				break;
+			}
+		}
+		if (kingFound) {
+			break;
+		}
+	}
 }

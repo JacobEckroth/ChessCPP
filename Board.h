@@ -20,7 +20,9 @@ public:
 	void setDownPiece(char &currentTurn);
 	void update();
 	void attemptMove(char&);
-
+	bool blackKingInCheck();
+	bool whiteKingInCheck();
+	void findKingRow(int& kingRow, int& kingCol, char team);
 	static int width;
 	static int height;
 	static int boxHeight;

@@ -52,7 +52,7 @@ void King::tryMove(std::vector<int>& possibleMoves, int row, int col, char** boa
 King::King(char team,int row, int col){
 	this->row = row;
 	this->col = col;
-	pieceType = 'k';
+	pieceType = 'K';
 	this->team = team;
 	if (team == 'w') {
 		pieceTexture = TextureManager::LoadTexture("images/whiteKing.png");
