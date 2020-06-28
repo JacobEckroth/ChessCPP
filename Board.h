@@ -22,7 +22,7 @@ public:
 	void pickUpPiece(int row, int col);
 	void setDownPiece(char &currentTurn,Box**& checkBoxes);
 	void update();
-	void attemptMove(char&,Box**& checkBoxes);
+	bool attemptMove(char&,Box**& checkBoxes);
 	bool blackKingInCheck(Box** searchBoxes,char**);
 	bool whiteKingInCheck(Box** searchBoxes,char**);
 	void findKingRow(int& kingRow, int& kingCol, char team,Box** searchBoxes);
@@ -30,6 +30,12 @@ public:
 	void freeBoardCopy(Box**,char**&);
 	void remakeBoardCopy(Box**&,char**&,bool&);
 	bool stillInCheckAfterThis(Box**&, char**&, int, int, int, int,char);
+	std::vector<int> getBlackPieces();
+
+
+
+	void randomBotMove();
+
 	static int width;
 	static int height;
 	static int boxHeight;

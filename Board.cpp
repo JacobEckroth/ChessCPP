@@ -63,6 +63,7 @@ Board::Board() {
 
 }
 
+
 Board::~Board() {
 	for (int i = 0; i < 8; i++) {
 		delete [](pieces[i]);
@@ -185,7 +186,7 @@ void Board::setDownPiece(char &currentTurn,Box**& checkBoxes) {	//test to see if
 
 }
 
-void Board::attemptMove(char& currentTurn,Box**& checkBoxes) {
+bool Board::attemptMove(char& currentTurn,Box**& checkBoxes) {	//true of move works, false if it doesn't
 	Piece* removedPiece = NULL;
 	int previousRow;
 	int previousCol;
@@ -232,7 +233,7 @@ void Board::attemptMove(char& currentTurn,Box**& checkBoxes) {
 				checkBoxes[row][col].setPiece(NULL);
 			}
 			std::cout << "Mistake! move that would put your own king in check was played.\n";
-
+			return false;
 		}	else {
 			delete(removedPiece);
 			currentTurn == 'w' ? currentTurn = 'b' : currentTurn = 'w';
@@ -245,6 +246,7 @@ void Board::attemptMove(char& currentTurn,Box**& checkBoxes) {
 				std::cout << "Checkmate check: " << checkForCheckmate(currentTurn);
 				std::cout << "The Black king is in check!" << std::endl;
 			}
+			return true;
 		}
 		
 		
@@ -336,6 +338,7 @@ void Board::findKingRow(int& kingRow, int& kingCol, char team,Box** searchBoxes)
 }
 
 
+
 char Board::checkForCheckmate(char currentTeam){ //we will check if the player is in check, and whether they can make a move where they cannot be in check anymore.
 	Box** copyOfBoard;
 	copyOfBoard = nullptr;
@@ -365,7 +368,6 @@ char Board::checkForCheckmate(char currentTeam){ //we will check if the player i
 			}
 		}
 	}
-	
 	freeBoardCopy(copyOfBoard, pieceCopy);
 	if (!wayOut) {
 		if (currentTeam == 'b') {
@@ -476,4 +478,31 @@ void Board::remakeBoardCopy(Box**& copyOfBoard,char**& pieceCopy,bool&firstTime)
 		}
 	}
 }
+
+
+void Board::randomBotMove() {
+	bool pieceMoved = false;
+	std::vector<int> pieces = getBlackPieces();
+	while (!pieceMoved) {
+		int piecePicked = rand() % (pieces.size() / 2);
+		//std::vector<int> moves = (boxes[pieces[piecePicked * 2]][pieces[piecePicked * 2 + 1]]).getPiece()->showMoves();
+		//for (int i = 0; i < moves.size() / 2; i++) {
+			
+		//}
+	}
+}
+
+std::vector<int> Board::getBlackPieces() {
+	std::vector<int> pieces;
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (boxes[i][j].getPiece()->getTeam() == 'b') {
+				pieces.push_back(i);
+				pieces.push_back(j);
+			}
+		}
+	}
+	return pieces;
+}
+
 
