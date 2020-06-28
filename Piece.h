@@ -4,6 +4,7 @@
 class Piece
 {
 public:
+	~Piece();
 	virtual std::vector<int> showMoves(int row, int col,char**) = 0;
 	 char getType();
 	 char getTeam();

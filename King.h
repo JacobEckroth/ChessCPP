@@ -7,5 +7,11 @@ public:
 	King(char,int,int);
 	void tryMove(std::vector<int>&, int row, int col, char**);
 	bool attemptMove(int row, int col,char**);
+	
+	bool inCheck() {
+		return isInCheck;
+	}
+private:
+	bool isInCheck;
 };
 

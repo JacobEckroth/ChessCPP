@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
 #include "Box.h";
+#include "BoardBackground.h"
 class Board
 {
 
 public:
-	Board();
+	Board(char*);
 	~Board();
 	void render(Box**);
 	Box** getBoxes() {
@@ -19,7 +20,8 @@ public:
 	void removeSelectedPiece(int row, int col,char);
 
 	void movePiece(int y,int  x,char& currentTurn);
-	void pickUpPiece(int row, int col);
+	
+
 	void setDownPiece(char &currentTurn,Box**& checkBoxes);
 	void update();
 	bool attemptMove(char&,Box**& checkBoxes);
@@ -41,6 +43,7 @@ public:
 	static int boxHeight;
 	static int boxWidth;
 private:
+	BoardBackground* boardBackground;
 	Box** boxes;
 	char** pieces;
 	int pickedUpCol;

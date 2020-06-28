@@ -2,10 +2,13 @@
 #include <iostream>
 #include "SDL.h"
 #include "Game.h"
-#define _CRTDBG_MAP_ALLOC  
+
 #include <cstdlib>  
-#include <crtdbg.h>  
+
 #include <ctime>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 int main(int argc, char**argv) {
 	Game* game = new Game();
@@ -18,8 +21,8 @@ int main(int argc, char**argv) {
 	}
 	
 	game->clean();
-	
-	_CrtDumpMemoryLeaks(); //this doesn't work.
+	delete(game);
+	_CrtDumpMemoryLeaks();
 	return 0;
 
 }

@@ -17,21 +17,25 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		if (renderer) {
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			std::cout << "Renderer created!\n";
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		}
 		isRunning = true;
 	}
 	else {
 		isRunning = false;
 	}
-	board = new Board();
+	
+	board = new Board((char*)("images/tanBackground.png"));
 	currentTurn = 'w';
+	
 }
 
 void Game::clean() {
 	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
+	SDL_DestroyWindow(window);	//error here
+	
 	SDL_Quit();
-
+	delete(board);	//gets rid of the board allocated.
 	std::cout << "Succesfully cleaned!\n";
 	
 }
@@ -71,9 +75,9 @@ void Game::handleMousePress(SDL_MouseButtonEvent& button) {
 }
 
 void Game::render() {
-	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
-	board->render(board->getBoxes());
+	board->render(board->getBoxes());	//the pieces?
 	SDL_RenderPresent(Game::renderer);
 
 	

@@ -12,16 +12,25 @@ public:
 	void toggleHighlight(char currentPlayer);
 	void render();
 	void setPiece(Piece* newPiece);
+	void toggleTargeted(bool);
 	Piece* getPiece() {
 		return piece;
 	};
 	void removePiece();
+	
+
 private:
+	SDL_Rect destRect;
 	int row;
 	int col;
-	int currentColor[3];
-	int originalColor[3];
+	Uint8 r;
+	Uint8 g;
+	Uint8 b;
+	Uint8 a;
+	
 	bool isHighlighted;
+	bool isTargeted;
 	Piece* piece;
+
 };
 
