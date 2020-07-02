@@ -1,7 +1,8 @@
 #include "Game.h"
 #include <iostream>
 SDL_Renderer* Game::renderer = nullptr;
-
+char Game::winner = 'n';
+char Game::currentTurn = 'w';
 void Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
 	int flags = 0;
 	if (fullscreen) {
@@ -40,8 +41,20 @@ void Game::clean() {
 	
 }
 
+void Game::checkForWinner() {
+	if (Game::winner == 'w') {
+		std::cout << "White wins";
+		isRunning = false;
+	}
+	else if (Game::winner== 'b') {
+		std::cout << "Black wins!" << std::endl;
+		isRunning = false;
+	}
+}
+
 void Game::update() {
 	board->update();
+	
 }
 
 void Game::handleEvents() {
@@ -64,6 +77,7 @@ void Game::handleMousePress(SDL_MouseButtonEvent& button) {
 	if (button.button == SDL_BUTTON_LEFT){
 		
 		SDL_GetMouseState(&x, &y);
+		
 		board->movePiece(y, x,currentTurn); 
 	}
 	else if (button.button == SDL_BUTTON_RIGHT) {	//delete the piece if you right click

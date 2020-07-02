@@ -15,15 +15,18 @@ public:
 	void render();
 	void handleMousePress(SDL_MouseButtonEvent& b);
 
+
+	void checkForWinner();
 	bool running();
 
+	static char winner;
 	static SDL_Renderer* renderer;
-
+	static char currentTurn;
 private:
 	bool isRunning;
 	SDL_Window* window;
 	Board* board;
-	char currentTurn;
+
 	
 
 

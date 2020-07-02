@@ -9,6 +9,7 @@
 #include "Queen.h"
 #include "King.h"
 #include "Pawn.h"
+#include "bigPieces.h"
 
 int Board::width = 800;
 int Board::height = 800;
@@ -16,11 +17,14 @@ int Board::boxHeight = height / 8;
 int Board::boxWidth = width / 8;
 
 Board::Board(char* boardBackgroundLink) {
-	std::cout << "Size of Piece:" << sizeof(Piece) << std::endl;
-	std::cout << "Size of Box:" << sizeof(Box) << std::endl;
+	whiteKingMoved = false;
+	blackKingMoved = false;
+	biggerPieces = new bigPieces();
+	promotionTeam = 'n';
+	
 	
 	boardBackground = new BoardBackground(boardBackgroundLink);
-	std::cout << "Board background link is: " << boardBackgroundLink;
+	
 	pickedUpCol = -1;
 	pickedUpRow = -1;
 	pieces = new char* [8];
@@ -76,6 +80,7 @@ Board::~Board() {
 	delete[] boxes;
 	delete [](pieces);
 	delete boardBackground;
+	delete biggerPieces;
 	
 }
 
@@ -103,6 +108,9 @@ void Board::render(Box** renderBoxes) {
 		boxes[pickedUpRow][pickedUpCol].getPiece()->render();
 		boxes[pickedUpRow][pickedUpCol].getPiece()->drawToMouse();
 	}
+	if (waitingForPromotion) {
+		renderBigPieces();
+	}
 }
 
 void Board::renderBoardBackground() {
@@ -111,7 +119,37 @@ void Board::renderBoardBackground() {
 
 void Board::highlightSquare(int row, int col,char currentTurn) {
 	std::vector<int> test = (boxes[row][col].getPiece())->showMoves(row, col,pieces);
-	
+	if(boxes[row][col].getPiece()->getType() == 'K'){
+		switch (currentTurn) {
+		case 'w':
+			
+			if (!whiteKingMoved) {
+				if (checkIfCanKingsCastle(currentTurn, boxes, pieces)) {
+					test.push_back(7);
+					test.push_back(6);
+						
+				}
+				if (checkIfCanQueensCastle(currentTurn, boxes, pieces)) {
+					test.push_back(7);
+					test.push_back(2); 
+				}
+			}
+		break;
+		case 'b':
+			if (!blackKingMoved) {
+				if (checkIfCanKingsCastle(currentTurn, boxes, pieces)) {
+					test.push_back(0);
+					test.push_back(6);
+
+				}
+				if (checkIfCanQueensCastle(currentTurn, boxes, pieces)) {
+					test.push_back(0);
+					test.push_back(2);
+				}
+			}
+
+		}
+	}
 
 	for (int i = 0; i < test.size() / 2; i++) {
 		boxes[test[i * 2]][test[i * 2 + 1]].toggleHighlight(currentTurn);	//this works because the coordinates are provided 
@@ -121,6 +159,17 @@ void Board::highlightSquare(int row, int col,char currentTurn) {
 	//boxes[row][col].toggleHighlight();
 	
 	
+}
+
+void Board::renderBigPieces() {
+	
+	if (promotionTeam == 'w') {
+		biggerPieces->render('w');
+	}
+	else {
+		biggerPieces->render('b');
+
+	}
 }
 
 void Board::updatePieceLocations(Box** checkBoxes, char**& checkPieces) {
@@ -158,12 +207,15 @@ void Board::removeSelectedPiece(int row, int col,char currentTurn) {
 
 
 void Board::movePiece(int row, int col, char &currentTurn) {
-	if (pickedUpCol != -1) {	//if we're holding a piece
+	row = row / 100;
+	col = col / 100;
+	if (waitingForPromotion) {
+		tryPromote(row, col);
+	}else if (pickedUpCol != -1) {	//if we're holding a piece
 		setDownPiece(currentTurn,boxes);
 	}
 	else { //picking up a new piece
-		row = row / 100;
-		col = col / 100;
+		
 		if (boxes[row][col].getPiece()) {
 			if (boxes[row][col].getPiece()->getTeam() == currentTurn) {
 				pickedUpRow = row;
@@ -175,6 +227,65 @@ void Board::movePiece(int row, int col, char &currentTurn) {
 
 }
 
+
+void Board::tryPromote(int rowTry, int colTry) {
+	if (rowTry == 3 || rowTry == 4) {
+		if (colTry >= 0 && colTry < 2) {
+			std::cout << "Promoting to queen";
+			waitingForPromotion = false;
+			boxes[promotionRow][promotionCol].removePiece();
+			boxes[promotionRow][promotionCol].setPiece(new Queen(promotionTeam,promotionRow,promotionCol));
+			checkChecks();
+		}
+		else if (colTry >= 2 && colTry < 4) {
+			std::cout << "Promoting to Rook";
+			waitingForPromotion = false;
+			boxes[promotionRow][promotionCol].removePiece();
+			boxes[promotionRow][promotionCol].setPiece(new Rook(promotionTeam, promotionRow, promotionCol));
+			checkChecks();
+		}
+		else if (colTry >= 4 && colTry < 6) {
+			std::cout << "Promoting to Knight" << std::endl;
+			waitingForPromotion = false;
+			boxes[promotionRow][promotionCol].removePiece();
+			boxes[promotionRow][promotionCol].setPiece(new Knight(promotionTeam, promotionRow, promotionCol));
+			checkChecks();
+		}
+		else if (colTry >= 6 && colTry <= 7) {
+			std::cout << "Promoting to Bishop" << std::endl;
+			waitingForPromotion = false;
+			boxes[promotionRow][promotionCol].removePiece();
+			boxes[promotionRow][promotionCol].setPiece(new Bishop(promotionTeam, promotionRow, promotionCol));
+			checkChecks();
+		}
+	}
+	
+}
+
+void Board::checkChecks() {
+	int whiteKingRow, whiteKingCol, blackKingRow, blackKingCol;
+	findKingRow(whiteKingRow, whiteKingCol, 'w', boxes);
+	findKingRow(blackKingRow, blackKingCol, 'b', boxes);
+	if (whiteKingInCheck(boxes, pieces)) {
+		boxes[whiteKingRow][whiteKingCol].toggleTargeted(true);
+		std::cout << "Checkmate check: " << checkForCheckmate(Game::currentTurn);
+		std::cout << "The white king is in check!" << std::endl;
+	}
+	else {
+		boxes[whiteKingCol][whiteKingCol].toggleTargeted(false);
+	}
+	if (blackKingInCheck(boxes, pieces)) {
+		boxes[blackKingRow][blackKingCol].toggleTargeted(true);
+		std::cout << "Checkmate check: " << checkForCheckmate(Game::currentTurn);
+		std::cout << "The Black king is in check!" << std::endl;
+	}
+	else {
+		boxes[blackKingRow][blackKingCol].toggleTargeted(false);
+	}
+}
+
+
+
 void Board::update() {
 	
 }
@@ -182,7 +293,22 @@ void Board::update() {
 void Board::setDownPiece(char &currentTurn,Box**& checkBoxes) {	//test to see if we want to set down a piece
 
 	if (pickedUpCol != -1) { //checking if a piece is actually picked up
-		attemptMove(currentTurn,checkBoxes);
+		int movedToRow, movedToCol;
+		if (attemptMove(currentTurn, checkBoxes,movedToRow,movedToCol)) {
+			
+			checkForPromotions(checkBoxes, currentTurn);
+			if (waitingForPromotion) {
+				promotionRow = movedToRow;
+				promotionCol = movedToCol;
+			}
+
+			if (currentTurn == 'w') {
+				currentTurn = 'b';
+			}
+			else {
+				currentTurn = 'w';
+			}
+		}
 		pickedUpCol = -1; 
 		pickedUpRow = -1;
 	}
@@ -192,7 +318,7 @@ void Board::setDownPiece(char &currentTurn,Box**& checkBoxes) {	//test to see if
 
 }
 
-bool Board::attemptMove(char& currentTurn,Box**& checkBoxes) {	//true if the move is valid, false if it isn't.
+bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int& movedToCol) {	//true if the move is valid, false if it isn't.
 	Piece* removedPiece = nullptr;
 	int previousRow;
 	int previousCol;
@@ -203,6 +329,118 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes) {	//true if the mov
 	int row = y / 100;
 	int col = x / 100;
 	int previousKingRow, previousKingCol;
+
+	//Castling Stuff here.
+	if (checkBoxes[pickedUpRow][pickedUpCol].getPiece()->getType() == 'K') {
+		switch (checkBoxes[pickedUpRow][pickedUpCol].getPiece()->getTeam()) {
+		case 'w':
+			if (!whiteKingMoved) {
+				if (row == 7 && col == 6) {	//kings side castle
+					if (checkIfCanKingsCastle(currentTurn, checkBoxes, pieces)) {
+						highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
+
+						checkBoxes[7][6].setPiece(checkBoxes[pickedUpRow][pickedUpCol].getPiece());
+						checkBoxes[pickedUpRow][pickedUpCol].setPiece(NULL);
+						checkBoxes[7][5].setPiece(checkBoxes[7][7].getPiece());	//set it to rook
+						checkBoxes[7][7].setPiece(NULL);	//remove the rook.
+
+						checkBoxes[7][6].getPiece()->setRow(7);
+						checkBoxes[7][6].getPiece()->setCol(6);
+						checkBoxes[7][6].getPiece()->resetPlace();
+						checkBoxes[7][6].getPiece()->setMoved();
+
+						checkBoxes[7][5].getPiece()->setRow(7);
+						checkBoxes[7][5].getPiece()->setCol(5);
+						checkBoxes[7][5].getPiece()->resetPlace();
+						checkBoxes[7][5].getPiece()->setMoved();
+						updatePieceLocations(checkBoxes, pieces);
+						return true;
+					}
+
+				}
+				else if (row == 7 && col == 2) {
+					if (checkIfCanQueensCastle(currentTurn, checkBoxes, pieces)) {
+						highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
+
+						checkBoxes[7][2].setPiece(checkBoxes[pickedUpRow][pickedUpCol].getPiece());
+						checkBoxes[pickedUpRow][pickedUpCol].setPiece(NULL);
+						checkBoxes[7][3].setPiece(checkBoxes[7][0].getPiece());	//set it to rook
+						checkBoxes[7][0].setPiece(NULL);	//remove the rook.
+						checkBoxes[7][2].getPiece()->setRow(7);
+						checkBoxes[7][2].getPiece()->setCol(2);
+						checkBoxes[7][2].getPiece()->resetPlace();
+						checkBoxes[7][2].getPiece()->setMoved();
+
+						checkBoxes[7][3].getPiece()->setRow(7);
+						checkBoxes[7][3].getPiece()->setCol(3);
+						checkBoxes[7][3].getPiece()->resetPlace();
+						checkBoxes[7][3].getPiece()->setMoved();
+						updatePieceLocations(checkBoxes, pieces);
+						return true;
+					}
+
+				}
+			}
+				break;
+			
+		case 'b':
+			if (!blackKingMoved) {
+				if (row == 0 && col == 6) {	//kings side castle
+					if (checkIfCanKingsCastle(currentTurn, checkBoxes, pieces)) {
+						highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
+
+						checkBoxes[0][6].setPiece(checkBoxes[pickedUpRow][pickedUpCol].getPiece());
+						checkBoxes[pickedUpRow][pickedUpCol].setPiece(NULL);
+						checkBoxes[0][5].setPiece(checkBoxes[0][7].getPiece());	//set it to rook
+						checkBoxes[0][7].setPiece(NULL);	//remove the rook.
+						checkBoxes[0][6].getPiece()->setRow(0);
+						checkBoxes[0][6].getPiece()->setCol(6);
+						checkBoxes[0][6].getPiece()->resetPlace();
+						checkBoxes[0][6].getPiece()->setMoved();
+
+						checkBoxes[0][5].getPiece()->setRow(0);
+						checkBoxes[0][5].getPiece()->setCol(5);
+						checkBoxes[0][5].getPiece()->resetPlace();
+						checkBoxes[0][5].getPiece()->setMoved();
+						updatePieceLocations(checkBoxes, pieces);
+						return true;
+					}
+
+				}
+				else if (row == 0 && col == 2) {
+					if (checkIfCanQueensCastle(currentTurn, checkBoxes, pieces)) {
+						highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
+
+						checkBoxes[0][2].setPiece(checkBoxes[pickedUpRow][pickedUpCol].getPiece());
+						checkBoxes[pickedUpRow][pickedUpCol].setPiece(NULL);
+						checkBoxes[0][3].setPiece(checkBoxes[0][0].getPiece());	//set it to rook
+						checkBoxes[0][0].setPiece(NULL);	//remove the rook.
+						checkBoxes[0][2].getPiece()->setRow(0);
+						checkBoxes[0][2].getPiece()->setCol(2);
+						checkBoxes[0][2].getPiece()->resetPlace();
+						checkBoxes[0][2].getPiece()->setMoved();
+
+						checkBoxes[0][3].getPiece()->setRow(0);
+						checkBoxes[0][3].getPiece()->setCol(3);
+						checkBoxes[0][3].getPiece()->resetPlace();
+						checkBoxes[0][3].getPiece()->setMoved();
+						updatePieceLocations(checkBoxes, pieces);
+						return true;
+					}
+
+				}
+			}
+			break;
+		default:
+			std::cout << "whoops" << std::endl;
+			break;
+		}
+		
+	}	//come back to this after class
+
+
+
+
 	findKingRow(previousKingRow, previousKingCol, currentTurn, checkBoxes);
 	if (checkBoxes[pickedUpRow][pickedUpCol].getPiece()->attemptMove(row, col, pieces)) { //if we can move there.
 		previousRow = pickedUpRow;
@@ -247,33 +485,33 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes) {	//true if the mov
 		}
 		else {	//the move didn't put your king into check.
 			if (removedPiece) {
-				std::cout << "Deleting removed Piece" << std::endl;
+	
 				delete(removedPiece);
 				removedPiece = nullptr;
 			}
-			currentTurn == 'w' ? currentTurn = 'b' : currentTurn = 'w';
+			
 			updatePieceLocations(checkBoxes, pieces);
 			int whiteKingRow, whiteKingCol, blackKingRow, blackKingCol;
-			findKingRow(whiteKingRow, whiteKingCol, currentTurn, checkBoxes);
-			findKingRow(blackKingRow, blackKingCol, currentTurn, checkBoxes);
+			findKingRow(whiteKingRow, whiteKingCol, 'w', checkBoxes);
+			findKingRow(blackKingRow, blackKingCol, 'b' , checkBoxes);
 			if (whiteKingInCheck(checkBoxes, pieces)) {
 				checkBoxes[whiteKingRow][whiteKingCol].toggleTargeted(true);
-				std::cout << "Checkmate check: " << checkForCheckmate(currentTurn);
-				std::cout << "The white king is in check!" << std::endl;
+			
 			}
 			else {
 				checkBoxes[previousKingRow][previousKingCol].toggleTargeted(false);
 			}
 			if (blackKingInCheck(checkBoxes, pieces)) {
 				checkBoxes[blackKingRow][blackKingCol].toggleTargeted(true);
-				std::cout << "Checkmate check: " << checkForCheckmate(currentTurn);
-				std::cout << "The Black king is in check!" << std::endl;
+			
 			}
 			else {
 				checkBoxes[previousKingRow][previousKingCol].toggleTargeted(false);
 			}
 			pickedUpRow = -1;
 			pickedUpCol = -1;
+			movedToRow = row;
+			movedToCol = col;
 			return true;
 		}
 
@@ -291,6 +529,154 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes) {	//true if the mov
 	
 }
 
+
+
+bool Board::checkIfSpotInCheck(char teamInCheckBy,int checkRow, int checkCol, Box** searchBoxes, char** currentPieces) {
+	char enemyTeam;
+	teamInCheckBy == 'w' ? enemyTeam = 'b' : enemyTeam = 'w';
+	if(searchBoxes)
+	
+	
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (searchBoxes[i][j].getPiece()) {
+				if (searchBoxes[i][j].getPiece()->getTeam() == teamInCheckBy) {
+					std::vector<int> possibleAttacks = searchBoxes[i][j].getPiece()->showMoves(i, j, currentPieces);
+					for (int k = 0; k < possibleAttacks.size() / 2; k++) {
+						if (possibleAttacks[k * 2] == checkRow && possibleAttacks[k * 2 + 1] == checkCol) {
+							return true;
+						}
+					}
+				}
+
+			}
+		}
+	}
+	return false;
+}
+
+bool Board::checkIfCanKingsCastle(char currentTeam, Box** checkBoxes, char** checkPieces) {
+	int kingRow, kingCol;
+	int backRow;
+	int rookCol = 7;
+	char enemyTeam;
+	switch (currentTeam) {
+	case 'w':
+		if (whiteKingInCheck(checkBoxes, checkPieces)) { //if the king is in check.
+			std::cout << "white king in check" << std::endl;
+			return false;
+		}
+		backRow = 7;
+		enemyTeam = 'b';
+		break;
+	case 'b':
+		if (blackKingInCheck(checkBoxes, checkPieces)) { // if the king is in check
+			return false;
+		}
+		backRow = 0;
+		enemyTeam = 'w';
+		break;
+	default:
+		std::cout << "error in checkIfCanKingsCastle" << std::endl;
+	}
+	findKingRow(kingRow, kingCol, currentTeam, checkBoxes);
+	if (checkBoxes[kingRow][kingCol].getPiece()->moved()) {	//if the king has moved
+		switch (currentTeam) {
+		case 'w':
+			whiteKingMoved = true;
+		
+			break;
+		case 'b':
+			blackKingMoved = true;
+			break;
+		default:
+			std::cout << "Error in switch statement in kingsCastle" << std::endl;
+		}
+		return false;
+	}
+	else if (!checkBoxes[backRow][rookCol].getPiece()) {	//if the rook isn't there.
+	
+		return false;
+	}
+	else if (checkBoxes[backRow][rookCol].getPiece()->moved()) {	//if the rook has moved
+
+		return false;
+	}
+	
+	for (int i = 5; i < 7; i++) {
+		if (checkBoxes[backRow][i].getPiece()) {	//if there are pieces
+			
+			return false;
+		}
+	}
+	for (int i = 5; i < 8; i++) {
+		if (checkIfSpotInCheck(enemyTeam, backRow, i, checkBoxes, checkPieces)) {	// if the spot is in check.
+	
+			return false;
+		}
+	}
+	return true;
+
+
+}
+
+bool Board::checkIfCanQueensCastle(char currentTeam, Box** checkBoxes, char** checkPieces) {
+	int kingRow, kingCol;
+	int backRow;
+	int rookCol = 0;
+	char enemyTeam;
+	switch (currentTeam) {
+	case 'w':
+		if (whiteKingInCheck(checkBoxes, checkPieces)) { //if the king is in check.
+			return false;
+		}
+		backRow = 7;
+		enemyTeam = 'b';
+		break;
+	case 'b':
+		if (blackKingInCheck(checkBoxes, checkPieces)) { // if the king is in check
+			return false;
+		}
+		backRow = 0;
+		enemyTeam = 'w';
+		break;
+	default:
+		std::cout << "error in checkIfCanKingsCastle" << std::endl;
+	}
+	findKingRow(kingRow, kingCol, currentTeam, checkBoxes);
+	if (checkBoxes[kingRow][kingCol].getPiece()->moved()) {	//if the king has moved
+		switch (currentTeam) {
+		case 'w':
+			whiteKingMoved = true;
+			break;
+		case 'b':
+			blackKingMoved = true;
+			break;
+		default:
+			std::cout << "Error in switch statement in kingsCastle" << std::endl;
+		}
+		return false;
+	}
+	else if (!checkBoxes[backRow][rookCol].getPiece()) {	//if the rook isn't there.
+		return false;
+	}
+	else if (checkBoxes[backRow][rookCol].getPiece()->moved()) {	//if the rook has moved
+		return false;
+	}
+
+	for (int i = 1; i < 4; i++) {
+		if (checkBoxes[backRow][i].getPiece()) {	//if there are pieces
+			return false;
+		}
+	}
+	for (int i = 0; i < 4; i++) {
+		if (checkIfSpotInCheck(enemyTeam, backRow, i, checkBoxes, checkPieces)) {	// if the spot is in check.
+			return false;
+		}
+	}
+	
+	return true;
+}
 
 
 //this takes in layout and determines if Black king is in check in this layout
@@ -316,6 +702,11 @@ bool Board::whiteKingInCheck(Box** searchBoxes,char** currentPieces) {
 	}
 	return false;
 }
+
+
+
+
+
 
 
 //takes in layout and determines if black king is in check. Returns true if king in check, false if they're not.
@@ -402,8 +793,10 @@ char Board::checkForCheckmate(char currentTeam){ //we will check if the player i
 	freeBoardCopy(copyOfBoard, pieceCopy);
 	if (!wayOut) {
 		if (currentTeam == 'b') {
+			Game::winner = 'w';
 			return 'w';
 		}
+		Game::winner = 'b';
 		return 'b';
 	}
 	else {
@@ -516,7 +909,6 @@ void Board::remakeBoardCopy(Box**& copyOfBoard,char**& pieceCopy,bool&firstTime)
 					std::cout << "error in switch statement in remakeBoardCopy" << std::endl;
 				}
 			}
-
 		}
 	}
 }
@@ -547,4 +939,28 @@ std::vector<int> Board::getBlackPieces() {
 	return pieces;
 }
 
+
+void Board::checkForPromotions(Box** checkBoxes,char teamToCheck) {
+	int row, col;
+	bool pawnFound = false;
+	teamToCheck == 'w' ? row = 0 : row = 7;
+	for (int i = 0; i < 8; i++) {
+		if (checkBoxes[row][i].getPiece()) {
+			if (checkBoxes[row][i].getPiece()->getType() == 'p') {
+				col = i;
+				pawnFound = true;
+			
+				waitingForPromotion = true;
+				
+				promotionTeam = teamToCheck;
+			
+				
+				break;
+			}
+		}
+	}
+	if (!pawnFound) {
+		return;
+	}
+}
 

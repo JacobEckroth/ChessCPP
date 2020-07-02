@@ -94,6 +94,25 @@ Queen::Queen(char team,int row, int col){
 	destRect.x = col * 100;
 	destRect.y = row * 100;
 }
+
+
+Queen::Queen(char team, int row, int col, int sizeMul) {
+	pieceType = 'q';
+	this->row = row;
+	this->col = col;
+	this->team = team;
+	if (team == 'w') {
+		pieceTexture = TextureManager::LoadTexture("images/whiteQueen.png");
+	}
+	else {
+		pieceTexture = TextureManager::LoadTexture("images/blackQueen.png");
+	}
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = srcRect.h =  100;
+	destRect.w = destRect.h = 100 * sizeMul;
+	destRect.x = col * 100;
+	destRect.y = row * 100;
+}
 bool Queen::attemptMove(int newRow, int newCol, char** boardStatus) {
 	std::vector<int> possibleMoves = showMoves(row, col, boardStatus);
 

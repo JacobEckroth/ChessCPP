@@ -5,7 +5,7 @@ class Bishop : public Piece
 public:
 	std::vector<int> showMoves(int row, int col,char**);
 	Bishop(char,int,int);
-	
+	Bishop(char, int, int, int);
 	bool canKeepMoving(std::vector<int>& possibleMoves,int row, int col, char**);
 	bool attemptMove(int row, int col,char**);
 };

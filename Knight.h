@@ -5,6 +5,7 @@ class Knight: public Piece
 public:
 	std::vector<int> showMoves(int row, int col,char**);
 	Knight(char,int,int);
+	Knight(char, int, int, int);
 	void testMove(std::vector<int>&, int, int,char**);
 	bool attemptMove(int row, int col,char**);
 };

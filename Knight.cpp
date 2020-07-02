@@ -68,6 +68,24 @@ Knight::Knight(char team,int row, int col) {
 	destRect.y = row * 100;
 }
 
+Knight::Knight(char team, int row, int col,int sizeMul) {
+	pieceType = 'k';
+	this->row = row;
+	this->col = col;
+	this->team = team;
+	if (team == 'w') {
+		pieceTexture = TextureManager::LoadTexture("images/whiteKnight.png");
+	}
+	else {
+		pieceTexture = TextureManager::LoadTexture("images/blackKnight.png");
+	}
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = srcRect.h  = 100;
+	destRect.w = destRect.h = 100 * sizeMul;
+	destRect.x = col * 100;
+	destRect.y = row * 100;
+}
+
 bool Knight::attemptMove(int newRow, int newCol, char** boardStatus) {
 	std::vector<int> possibleMoves = showMoves(row, col, boardStatus);
 

@@ -97,10 +97,10 @@ void Box::setPiece(Piece* newPiece) {
 };
 
 void Box::removePiece() {
-	/*if (piece) {
-		free(piece);
+	if (piece) {
+		delete piece;
 		piece = nullptr;
-	}*/
+	}
 }
 
 void Box::toggleTargeted(bool newTargeted) {

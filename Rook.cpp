@@ -77,6 +77,27 @@ Rook::Rook(char team,int row, int col) {
 
 
 }
+
+Rook::Rook(char team, int row, int col,int sizeMul) {
+	this->row = row;
+	this->col = col;
+	this->team = team;
+	pieceType = 'r';
+	if (team == 'w') {
+		pieceTexture = TextureManager::LoadTexture("images/whiteRook.png");
+	}
+	else {
+		pieceTexture = TextureManager::LoadTexture("images/blackRook.png");
+	}
+	srcRect.x = srcRect.y = 0;
+	srcRect.w = srcRect.h = 100;
+	destRect.w = destRect.h = 100 * sizeMul;
+	destRect.x = col * 100;
+	destRect.y = row * 100;
+
+
+
+}
 bool Rook::attemptMove(int newRow, int newCol, char** boardStatus) {
 	std::vector<int> possibleMoves = showMoves(row, col, boardStatus);
 
