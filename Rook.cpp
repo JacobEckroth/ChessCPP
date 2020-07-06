@@ -92,7 +92,7 @@ Rook::Rook(char team, int row, int col,int sizeMul) {
 		pieceTexture = TextureManager::LoadTexture("images/blackRook.png");
 	}
 	srcRect.x = srcRect.y = 0;
-	srcRect.w = srcRect.h = 100;
+	srcRect.w = srcRect.h = 32;
 	destRect.w = Board::boxWidth * sizeMul;
 	destRect.h = Board::boxHeight * sizeMul;
 	destRect.x = col * Board::boxWidth;

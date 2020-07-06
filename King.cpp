@@ -61,7 +61,7 @@ King::King(char team,int row, int col){
 		pieceTexture = TextureManager::LoadTexture("images/blackKing.png");
 	}
 	srcRect.x = srcRect.y = 0;
-	srcRect.w = srcRect.h = 100;
+	srcRect.w = srcRect.h = 32;
 	destRect.w = Board::boxWidth;
 	destRect.h = Board::boxHeight;
 	destRect.x = col * Board::boxWidth;
