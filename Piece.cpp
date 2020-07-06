@@ -18,14 +18,14 @@ void Piece::render() {
 void Piece::drawToMouse() {
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	destRect.x = x - 50;
-	destRect.y = y - 50;
+	destRect.x = x - Board::boxWidth/2;
+	destRect.y = y - Board::boxHeight/2;
 	
 	pickedUp = true;
 }
 void Piece::resetPlace() {
-	destRect.x = col * 100;
-	destRect.y = row * 100;
+	destRect.x = col * (Board::boxWidth);
+	destRect.y = row * Board::boxHeight;
 }
 Piece::~Piece() {
 	if (pieceTexture) {

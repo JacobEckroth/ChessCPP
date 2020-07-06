@@ -10,24 +10,30 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <string>
-
+#include "wtypes.h"
 bool again();
+void calculateWindowSizes(int&, int&);
 
 int main(int argc, char**argv) {
 	Game* game; 
 	
 	srand(time(NULL));
 	bool playAgain = true;
+
+	int windowWidth = 800;
+	int windowHeight = 800;
+	calculateWindowSizes(windowWidth, windowHeight);
+
 	while (playAgain) {
 		game = new Game;
-		game->init("Chess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, false);
+		game->init("Chess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, false);
 		while (game->running()) {
 			game->handleEvents();
 			game->update();
 			game->render();
 			game->checkForWinner();
 		}
-		SDL_Delay(3000);	//delay to show board before deleting it.
+		SDL_Delay(1000);	//delay to show board before deleting it.
 		game->clean();
 		delete(game);
 		playAgain = again();
@@ -38,7 +44,22 @@ int main(int argc, char**argv) {
 	return 0;
 }
 
+void calculateWindowSizes(int& windowWidth, int& windowHeight) {
+	RECT desktop;
+	const HWND hDesktop = GetDesktopWindow();
+	GetWindowRect(hDesktop, &desktop);
+	
+	int vertical = desktop.bottom;
+	
+	vertical =  int(vertical * .8);
+	while (vertical % 8 != 0) {
+		vertical--;
+	}
+	windowWidth = vertical;
+	windowHeight = vertical;
 
+
+}
 bool again() {
 	std::cout << "Play again? yes or no?" << std::endl;
 	std::string userInput = "";

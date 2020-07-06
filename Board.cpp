@@ -11,12 +11,16 @@
 #include "Pawn.h"
 #include "bigPieces.h"
 
-int Board::width = 800;
-int Board::height = 800;
+int Board::width = 600;
+int Board::height = 600;
 int Board::boxHeight = height / 8;
 int Board::boxWidth = width / 8;
 
-Board::Board(char* boardBackgroundLink) {
+Board::Board(char* boardBackgroundLink,int newWidth, int newHeight) {
+	Board::width = newWidth;
+	Board::height = newHeight;
+	Board::boxHeight = height / 8;
+	Board::boxWidth = width / 8;
 	whiteKingMoved = false;
 	blackKingMoved = false;
 	biggerPieces = new bigPieces();
@@ -152,6 +156,7 @@ void Board::highlightSquare(int row, int col,char currentTurn) {
 	}
 
 	for (int i = 0; i < test.size() / 2; i++) {
+	
 		boxes[test[i * 2]][test[i * 2 + 1]].toggleHighlight(currentTurn);	//this works because the coordinates are provided 
 		//2 in a row, so if I multiply by 2 I can get to the first and the second.
 	}
@@ -199,16 +204,16 @@ void Board::printBoard(char** printPieces) {
 
 void Board::removeSelectedPiece(int row, int col,char currentTurn) {
 	setDownPiece(currentTurn,boxes);
-	row = row / 100;
-	col = col / 100;
+	row = row / boxHeight;
+	col = col / boxWidth;
 	boxes[row][col].removePiece();
 
 }
 
 
 void Board::movePiece(int row, int col, char &currentTurn) {
-	row = row / 100;
-	col = col / 100;
+	row = row / boxHeight;
+	col = col / boxWidth;
 	if (waitingForPromotion) {
 		tryPromote(row, col);
 	}else if (pickedUpCol != -1) {	//if we're holding a piece
@@ -326,8 +331,8 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int
 	int x;
 	int y;
 	SDL_GetMouseState(&x, &y);
-	int row = y / 100;
-	int col = x / 100;
+	int row = y / boxHeight;
+	int col = x / boxWidth;
 	int previousKingRow, previousKingCol;
 
 	//Castling Stuff here.
@@ -436,7 +441,7 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int
 			break;
 		}
 		
-	}	//come back to this after class
+	}	
 
 
 
@@ -481,6 +486,7 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int
 				checkBoxes[row][col].setPiece(NULL);
 			}
 			std::cout << "Mistake! move that would put your own king in check was played.\n";
+			updatePieceLocations(boxes, pieces);
 			return false;
 		}
 		else {	//the move didn't put your king into check.

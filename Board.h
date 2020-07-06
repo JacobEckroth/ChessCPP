@@ -7,7 +7,7 @@ class Board
 {
 
 public:
-	Board(char*);
+	Board(char*,int,int);
 	~Board();
 	void render(Box**);
 	Box** getBoxes() {

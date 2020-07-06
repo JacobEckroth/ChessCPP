@@ -61,9 +61,11 @@ King::King(char team,int row, int col){
 		pieceTexture = TextureManager::LoadTexture("images/blackKing.png");
 	}
 	srcRect.x = srcRect.y = 0;
-	srcRect.w = srcRect.h = destRect.w = destRect.h = 100;
-	destRect.x = col * 100;
-	destRect.y = row * 100;
+	srcRect.w = srcRect.h = 100;
+	destRect.w = Board::boxWidth;
+	destRect.h = Board::boxHeight;
+	destRect.x = col * Board::boxWidth;
+	destRect.y = row * Board::boxHeight;
 }
 bool King::attemptMove(int newRow, int newCol, char** boardStatus) {
 	std::vector<int> possibleMoves = showMoves(row, col, boardStatus);

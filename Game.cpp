@@ -26,7 +26,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		isRunning = false;
 	}
 	
-	board = new Board((char*)("images/tanBackground.png"));
+	board = new Board((char*)("images/tanBackground.png"),width,height);
 	currentTurn = 'w';
 	
 }
