@@ -9,7 +9,7 @@ public:
 	~Box();
 	Box(int,int);
 	bool highlighted();
-	void toggleHighlight(char currentPlayer);
+	void toggleHighlight(char currentPlayer,int,int);
 	void render();
 	void setPiece(Piece* newPiece);
 	void toggleTargeted(bool);

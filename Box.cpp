@@ -33,14 +33,19 @@ bool Box::highlighted() {
 	return isHighlighted;
 }
 
-void Box::toggleHighlight(char currentPlayer) {
+void Box::toggleHighlight(char currentPlayer,int enPassantRow, int enPassantCol) {
 	
 	isHighlighted == true ? isHighlighted = false : isHighlighted = true;
 
 	char enemyPlayer;
 	currentPlayer == 'w' ? enemyPlayer = 'b' : enemyPlayer = 'w';
-
-	if (isHighlighted) {
+	if (enPassantRow == row && enPassantCol == col) {
+		r = 255;
+		g = 0;
+		b = 0;
+		a = 50;
+	}
+	else if (isHighlighted) {
 		if (getPiece()) {
 			if (getPiece()->getTeam() == enemyPlayer) {
 				r = 255;

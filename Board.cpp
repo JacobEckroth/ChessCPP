@@ -10,6 +10,7 @@
 #include "King.h"
 #include "Pawn.h"
 #include "bigPieces.h"
+#include <cmath>
 
 int Board::width = 600;
 int Board::height = 600;
@@ -17,6 +18,8 @@ int Board::boxHeight = height / 8;
 int Board::boxWidth = width / 8;
 
 Board::Board(char* boardBackgroundLink,int newWidth, int newHeight) {
+	justMovedRow = -1;
+	justMovedCol = -1;
 	Board::width = newWidth;
 	Board::height = newHeight;
 	Board::boxHeight = height / 8;
@@ -60,39 +63,39 @@ Board::Board(char* boardBackgroundLink,int newWidth, int newHeight) {
 
 	//white pieces
 
-	boxes[7][0].setPiece(new Rook('w',7,0));
-	boxes[7][7].setPiece(new Rook('w',7,7));
-	boxes[7][6].setPiece(new Knight('w',7,6));
-	boxes[7][1].setPiece(new Knight('w',7,1));
-	boxes[7][2].setPiece(new Bishop('w',7,2));
-	boxes[7][5].setPiece(new Bishop('w',7,5));
-	boxes[7][4].setPiece(new King('w',7,4));
-	boxes[7][3].setPiece(new Queen('w',7,3));
-	
-	updatePieceLocations(boxes,pieces);
+boxes[7][0].setPiece(new Rook('w', 7, 0));
+boxes[7][7].setPiece(new Rook('w', 7, 7));
+boxes[7][6].setPiece(new Knight('w', 7, 6));
+boxes[7][1].setPiece(new Knight('w', 7, 1));
+boxes[7][2].setPiece(new Bishop('w', 7, 2));
+boxes[7][5].setPiece(new Bishop('w', 7, 5));
+boxes[7][4].setPiece(new King('w', 7, 4));
+boxes[7][3].setPiece(new Queen('w', 7, 3));
 
-	
+updatePieceLocations(boxes, pieces);
+
+
 
 }
 
 
 Board::~Board() {
 	for (int i = 0; i < 8; i++) {
-		delete [](pieces[i]);
+		delete[](pieces[i]);
 		delete[] boxes[i];
 	}
 	delete[] boxes;
-	delete [](pieces);
+	delete[](pieces);
 	delete boardBackground;
 	delete biggerPieces;
-	
+
 }
 
 
 void Board::render(Box** renderBoxes) {
 	renderBoardBackground();
-	
-	
+
+
 
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -100,11 +103,11 @@ void Board::render(Box** renderBoxes) {
 			if (boxes[i][j].getPiece()) {
 				if (i != pickedUpRow || j != pickedUpCol) {
 					boxes[i][j].getPiece()->render();
-					
+
 				}
-				
-				
-				
+
+
+
 			}
 		}
 	}
@@ -121,24 +124,24 @@ void Board::renderBoardBackground() {
 	boardBackground->render();
 }
 
-void Board::highlightSquare(int row, int col,char currentTurn) {
-	std::vector<int> test = (boxes[row][col].getPiece())->showMoves(row, col,pieces);
-	if(boxes[row][col].getPiece()->getType() == 'K'){
+void Board::highlightSquare(int row, int col, char currentTurn) {
+	std::vector<int> test = (boxes[row][col].getPiece())->showMoves(row, col, pieces);
+	if (boxes[row][col].getPiece()->getType() == 'K') {
 		switch (currentTurn) {
 		case 'w':
-			
+
 			if (!whiteKingMoved) {
 				if (checkIfCanKingsCastle(currentTurn, boxes, pieces)) {
 					test.push_back(7);
 					test.push_back(6);
-						
+
 				}
 				if (checkIfCanQueensCastle(currentTurn, boxes, pieces)) {
 					test.push_back(7);
-					test.push_back(2); 
+					test.push_back(2);
 				}
 			}
-		break;
+			break;
 		case 'b':
 			if (!blackKingMoved) {
 				if (checkIfCanKingsCastle(currentTurn, boxes, pieces)) {
@@ -154,10 +157,44 @@ void Board::highlightSquare(int row, int col,char currentTurn) {
 
 		}
 	}
+	else if (boxes[row][col].getPiece()->getType() == 'p') { //en passant
+		if (justMovedRow != -1) {
+			switch (currentTurn) {
+			case 'w':
+				if (justMovedRow == row) {
+					if (std::abs(justMovedCol - col) == 1) {	//if it's one row away
+						test.push_back(row - 1);
+						test.push_back(justMovedCol);
+					}
+				}
+				
+				break;
+
+			case 'b':
+				if (justMovedRow == row) {
+					if (std::abs(justMovedCol - col) == 1) {	//if it's one row away
+						test.push_back(row + 1);
+						test.push_back(justMovedCol);
+					}
+				}
+
+				break;
+
+			default:
+				std::cout << "error in en passant switch" << std::endl;
+				break;
+
+			}
+		}
+
+	}
+
+	
+
 
 	for (int i = 0; i < test.size() / 2; i++) {
 	
-		boxes[test[i * 2]][test[i * 2 + 1]].toggleHighlight(currentTurn);	//this works because the coordinates are provided 
+		boxes[test[i * 2]][test[i * 2 + 1]].toggleHighlight(currentTurn,enPassantRow,enPassantCol);	//this works because the coordinates are provided 
 		//2 in a row, so if I multiply by 2 I can get to the first and the second.
 	}
 
@@ -324,7 +361,7 @@ void Board::setDownPiece(char &currentTurn,Box**& checkBoxes) {	//test to see if
 }
 
 bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int& movedToCol) {	//true if the move is valid, false if it isn't.
-	Piece* removedPiece = nullptr;
+	Piece* removedPiece = NULL;
 	int previousRow;
 	int previousCol;
 	bool validMove = false;
@@ -442,6 +479,7 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int
 		}
 		
 	}	
+	
 
 
 
@@ -453,13 +491,34 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int
 		bool moveStatus = checkBoxes[pickedUpRow][pickedUpCol].getPiece()->moved();
 		if (checkBoxes[row][col].getPiece()) {	//if there's a piece to take
 			highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
-			checkBoxes[row][col].removePiece();
 			removedPiece = checkBoxes[row][col].getPiece();
+		
+		
 			checkBoxes[row][col].setPiece(checkBoxes[pickedUpRow][pickedUpCol].getPiece());
 			checkBoxes[pickedUpRow][pickedUpCol].setPiece(NULL);
 
 		}
-		else {	//if yo ucan just move there.
+		else if (row == enPassantRow && col == enPassantCol) {
+			switch (currentTurn) {
+			case 'w':
+				if (pickedUpRow == justMovedRow && std::abs(pickedUpCol-enPassantCol) == 1) {
+					
+				}
+
+				break;
+			case 'b':
+				if (pickedUpRow == justMovedRow && std::abs(pickedUpCol - enPassantCol) == 1) {
+
+				}
+
+				break;
+			default:
+
+				break;
+			}
+
+
+		} else {	//if yo ucan just move there.
 			highlightSquare(pickedUpRow, pickedUpCol, currentTurn);
 			checkBoxes[row][col].setPiece(checkBoxes[pickedUpRow][pickedUpCol].getPiece());
 			checkBoxes[pickedUpRow][pickedUpCol].setPiece(NULL);
@@ -470,7 +529,7 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int
 		checkBoxes[row][col].getPiece()->resetPlace();
 		checkBoxes[row][col].getPiece()->setMoved();
 
-		updatePieceLocations(boxes, pieces);
+		updatePieceLocations(checkBoxes, pieces);
 		//if a move was made that would put your king in check/keep your king in check.
 		if ((whiteKingInCheck(checkBoxes, pieces) && currentTurn == 'w') || (blackKingInCheck(checkBoxes, pieces) && currentTurn == 'b')) {
 			checkBoxes[previousRow][previousCol].setPiece(checkBoxes[row][col].getPiece());
@@ -479,14 +538,16 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int
 			checkBoxes[previousRow][previousCol].getPiece()->resetPlace();
 			checkBoxes[previousRow][previousCol].getPiece()->resetMoved(moveStatus);
 			if (removedPiece) {
+				
 				checkBoxes[row][col].setPiece(removedPiece);
 				removedPiece = nullptr;
+			
 			}
 			else {
 				checkBoxes[row][col].setPiece(NULL);
 			}
 			std::cout << "Mistake! move that would put your own king in check was played.\n";
-			updatePieceLocations(boxes, pieces);
+			updatePieceLocations(checkBoxes, pieces);
 			return false;
 		}
 		else {	//the move didn't put your king into check.
@@ -495,7 +556,27 @@ bool Board::attemptMove(char& currentTurn,Box**& checkBoxes,int& movedToRow, int
 				delete(removedPiece);
 				removedPiece = nullptr;
 			}
-			
+			if (checkBoxes[row][col].getPiece()->getType() == 'p') {
+				if (std::abs(row - previousRow) == 2) {	//if it's a pawn that just moved.
+					justMovedRow = row;
+					justMovedCol = col;
+					enPassantCol = justMovedCol;
+					switch (currentTurn) {
+					case 'w':
+						enPassantRow = justMovedRow + 1;
+						break;
+					case 'b':
+						enPassantRow = justMovedRow - 1;
+						break;
+					}
+
+				}
+				else {
+					justMovedRow = justMovedCol = enPassantRow = enPassantCol = -1;
+					
+				}
+			}
+		
 			updatePieceLocations(checkBoxes, pieces);
 			int whiteKingRow, whiteKingCol, blackKingRow, blackKingCol;
 			findKingRow(whiteKingRow, whiteKingCol, 'w', checkBoxes);

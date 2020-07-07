@@ -58,13 +58,23 @@ private:
 	bool blackKingMoved;
 	BoardBackground* boardBackground;
 	Box** boxes;
-	bigPieces* biggerPieces;
 	char** pieces;
+
+	Box** previousBoxes;
+	char** previousPieces;
+
+
+	bigPieces* biggerPieces;
+	
 	int pickedUpCol;
 	int pickedUpRow;
 	bool waitingForPromotion = false;
 	char promotionTeam = 'n';
 	int promotionRow;
 	int promotionCol;
+	int justMovedRow;
+	int justMovedCol;
+	int enPassantRow;
+	int enPassantCol;
 };
 

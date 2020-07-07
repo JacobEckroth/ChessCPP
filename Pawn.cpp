@@ -50,6 +50,7 @@ std::vector<int> Pawn::showMoves(int row, int col,char** boardStatus) {
 	return possibleMoves;
 }
 Pawn::Pawn(char team,int row, int col) {
+	justMoved = false;
 	this->row = row;
 	this->col = col;
 	pieceType = 'p';
